@@ -169,36 +169,6 @@ export function Hero() {
             </div>
           </div>
 
-          {/* Video loop frame — sits below logo on desktop right column */}
-          <div className="mt-8">
-            <div className="relative rounded-bezel bg-white/[0.025] p-1.5 ring-1 ring-border-subtle">
-              <div className="relative aspect-[16/10] w-full overflow-hidden rounded-bezel-inner bg-bg-secondary shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]">
-                {/* TODO: USER — Add Higgsfield-generated hero video at /public/hero-loop.mp4 */}
-                <video
-                  autoPlay
-                  loop
-                  muted
-                  playsInline
-                  preload="metadata"
-                  poster="/logo.png"
-                  className="h-full w-full object-cover"
-                  aria-label="Best Grillz product reel"
-                >
-                  <source src="/hero-loop.mp4" type="video/mp4" />
-                </video>
-                <div
-                  aria-hidden
-                  className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,_transparent_30%,_rgba(0,0,0,0.6)_100%)]"
-                />
-                <div className="absolute left-4 top-4 inline-flex items-center gap-2 rounded-full border border-border-strong bg-bg-primary/70 px-3 py-1 backdrop-blur-md">
-                  <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-accent-ice" />
-                  <span className="font-mono text-[10px] uppercase tracking-widest text-text-secondary">
-                    Live Reel
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
         </motion.div>
       </div>
 
