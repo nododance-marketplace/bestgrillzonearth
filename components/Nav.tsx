@@ -43,12 +43,12 @@ export function Nav() {
         )}
         aria-label="Primary"
       >
-        <div className="flex items-center gap-3 pl-1">
+        <div className="flex min-w-0 items-center gap-2 pl-1 md:gap-3">
           <Logo size={44} />
           <Link
             href="/"
             aria-label="Best Grillz On Earth — Home"
-            className="hidden sm:inline-flex"
+            className="inline-flex min-w-0 shrink"
           >
             <Image
               src="/wordmark-linear.png"
@@ -56,7 +56,7 @@ export function Nav() {
               width={1040}
               height={176}
               priority
-              className="h-10 w-auto select-none md:h-12"
+              className="h-9 w-auto select-none sm:h-11 md:h-14 lg:h-16"
             />
           </Link>
         </div>
@@ -74,11 +74,11 @@ export function Nav() {
           ))}
         </ul>
 
-        <div className="flex items-center gap-2">
+        <div className="flex shrink-0 items-center gap-1.5 md:gap-2">
           <Link
             href="/shop"
             aria-label="Cart — 0 items"
-            className="group relative inline-flex h-10 w-10 items-center justify-center rounded-full ring-1 ring-border-strong transition-colors duration-300 hover:bg-white/[0.06]"
+            className="group relative inline-flex h-9 w-9 items-center justify-center rounded-full ring-1 ring-border-strong transition-colors duration-300 hover:bg-white/[0.06] md:h-10 md:w-10"
           >
             <ShoppingBagOpen size={18} weight="regular" />
             <span className="absolute -right-1 -top-1 inline-flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-accent-silver px-1 font-mono text-[10px] font-semibold text-bg-primary">
@@ -89,7 +89,7 @@ export function Nav() {
           <button
             type="button"
             onClick={() => setOpen((v) => !v)}
-            className="inline-flex h-10 w-10 items-center justify-center rounded-full ring-1 ring-border-strong transition-colors duration-300 hover:bg-white/[0.06] md:hidden"
+            className="inline-flex h-9 w-9 items-center justify-center rounded-full ring-1 ring-border-strong transition-colors duration-300 hover:bg-white/[0.06] md:hidden"
             aria-expanded={open}
             aria-controls="mobile-menu"
             aria-label={open ? "Close menu" : "Open menu"}
