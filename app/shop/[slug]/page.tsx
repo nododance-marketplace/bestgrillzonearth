@@ -3,7 +3,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
-  Diamond,
   ArrowLeft,
   Sparkle,
   ShieldCheck,
@@ -13,6 +12,7 @@ import { Nav } from "@/components/Nav";
 import { Footer } from "@/components/Footer";
 import { Bezel } from "@/components/Bezel";
 import { CTAButton } from "@/components/CTAButton";
+import { ProductDetailClient } from "@/components/ProductDetailClient";
 import { products, productBySlug } from "@/data/products";
 
 export function generateStaticParams() {
@@ -52,91 +52,14 @@ export default function ProductDetailPage({ params }: { params: { slug: string }
           className="mx-auto mt-12 grid w-full max-w-shell grid-cols-1 gap-12 px-6 md:grid-cols-12 md:gap-12 md:px-10"
           aria-labelledby="product-heading"
         >
-          {/* Gallery */}
-          <div className="md:col-span-7">
-            <Bezel>
-              <div className="relative aspect-square w-full overflow-hidden bg-bg-tertiary">
-                {/* TODO: USER — Replace placeholder image at /public/products/[slug].jpg */}
-                <Image
-                  src={product.image}
-                  alt={`${product.name} — ${product.descriptor}`}
-                  fill
-                  priority
-                  sizes="(min-width: 1024px) 720px, 100vw"
-                  className="object-cover"
-                />
-                <div
-                  aria-hidden
-                  className="pointer-events-none absolute inset-0 flex items-center justify-center bg-[radial-gradient(ellipse_at_center,_rgba(232,232,232,0.06),_transparent_70%)]"
-                >
-                  <div className="flex flex-col items-center gap-3 text-text-muted">
-                    <Diamond size={64} weight="duotone" className="text-accent-silver/40" />
-                    <span className="font-mono text-[10px] uppercase tracking-widest">
-                      Add product image — /public/products/{product.slug}.png
-                    </span>
-                  </div>
-                </div>
-                <div className="absolute left-5 top-5 inline-flex items-center gap-2 rounded-full border border-border-strong bg-bg-primary/70 px-3 py-1 backdrop-blur-md">
-                  <span className="h-1.5 w-1.5 rounded-full bg-accent-silver" />
-                  <span className="font-mono text-[10px] uppercase tracking-widest text-text-secondary">
-                    {product.category}
-                  </span>
-                </div>
-              </div>
-            </Bezel>
+          {/* Client component: gallery + finish picker (state-driven) */}
+          <ProductDetailClient product={product} />
+        </section>
 
-            {/* Thumb row — placeholder for multiple angles */}
-            <ul className="mt-4 grid grid-cols-4 gap-3" aria-label="Additional angles">
-              {[0, 1, 2, 3].map((i) => (
-                <li
-                  key={i}
-                  className="relative aspect-square overflow-hidden rounded-2xl bg-bg-secondary ring-1 ring-border-subtle"
-                >
-                  <div className="flex h-full w-full items-center justify-center">
-                    <Diamond size={20} weight="duotone" className="text-accent-silver/30" />
-                  </div>
-                  <span className="absolute bottom-2 left-2 font-mono text-[9px] uppercase tracking-widest text-text-muted">
-                    {i === 0 ? "Front" : i === 1 ? "Side" : i === 2 ? "Macro" : "Worn"}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Details */}
-          <div className="md:col-span-5 md:pt-6">
-            <span className="inline-flex items-center gap-2 rounded-full border border-border-strong bg-bg-secondary/60 px-3 py-1 backdrop-blur-md">
-              <span className="h-1.5 w-1.5 rounded-full bg-accent-silver" />
-              <span className="font-mono text-[10px] uppercase tracking-widest text-text-secondary">
-                {product.category}
-              </span>
-            </span>
-
-            <h1
-              id="product-heading"
-              className="mt-6 font-display text-5xl uppercase leading-[0.9] tracking-tight md:text-6xl"
-            >
-              {product.name}
-            </h1>
-
-            <p className="mt-4 font-mono text-xs uppercase tracking-widest text-text-muted">
-              {product.descriptor}
-            </p>
-
-            <div className="mt-8 flex items-baseline gap-3">
-              <span className="font-mono text-[11px] uppercase tracking-widest text-text-muted">
-                From
-              </span>
-              <span className="diamond-text font-mono text-4xl font-semibold tracking-wider">
-                ${product.priceFrom.toLocaleString()}
-              </span>
-            </div>
-
-            <p className="mt-8 text-base leading-relaxed text-text-secondary">
-              {product.longDescription}
-            </p>
-
-            <ul className="mt-8 flex flex-col gap-3 border-y border-border-subtle py-8">
+        {/* Highlights + CTAs + AR callout — sits below the gallery on its own row */}
+        <section className="mx-auto mt-16 grid w-full max-w-shell grid-cols-1 gap-12 px-6 md:grid-cols-12 md:gap-12 md:px-10">
+          <div className="md:col-span-7 md:col-start-6">
+            <ul className="flex flex-col gap-3 border-y border-border-subtle py-8">
               {product.highlights.map((h) => (
                 <li key={h} className="flex items-start gap-3 text-sm text-text-secondary">
                   <Sparkle
@@ -151,7 +74,9 @@ export default function ProductDetailPage({ params }: { params: { slug: string }
 
             <div className="mt-10 flex flex-wrap items-center gap-4">
               {/* TODO: USER — Replace with real order link, contact form, or Instagram DM */}
-              <CTAButton href="mailto:hello@bestgrillz.com?subject=Start Order — Best Grillz On Earth">
+              <CTAButton
+                href={`mailto:hello@bestgrillz.com?subject=Start Order — ${product.name} (Best Grillz On Earth)`}
+              >
                 Start Your Order
               </CTAButton>
               <CTAButton href="/shop" variant="ghost">
@@ -159,7 +84,6 @@ export default function ProductDetailPage({ params }: { params: { slug: string }
               </CTAButton>
             </div>
 
-            {/* AR Try-on callout */}
             <div className="mt-10 rounded-2xl border border-border-strong bg-bg-secondary/60 p-5">
               <div className="flex items-start gap-3">
                 <Camera size={20} weight="duotone" className="mt-0.5 text-accent-ice" />
@@ -221,14 +145,11 @@ export default function ProductDetailPage({ params }: { params: { slug: string }
           <ul className="grid grid-cols-1 gap-8 md:grid-cols-3">
             {related.map((p) => (
               <li key={p.slug} className="list-none">
-                <Link
-                  href={`/shop/${p.slug}`}
-                  className="group/related block"
-                >
+                <Link href={`/shop/${p.slug}`} className="group/related block">
                   <Bezel>
-                    <div className="relative aspect-[4/5] overflow-hidden bg-bg-tertiary">
+                    <div className="relative aspect-square overflow-hidden bg-bg-tertiary">
                       <Image
-                        src={p.image}
+                        src={p.gallery[0]}
                         alt={p.name}
                         fill
                         sizes="(min-width: 1024px) 380px, 100vw"
@@ -236,14 +157,8 @@ export default function ProductDetailPage({ params }: { params: { slug: string }
                       />
                       <div
                         aria-hidden
-                        className="absolute inset-0 flex items-center justify-center bg-[radial-gradient(ellipse_at_center,_rgba(232,232,232,0.06),_transparent_70%)]"
-                      >
-                        <Diamond
-                          size={32}
-                          weight="duotone"
-                          className="text-accent-silver/30"
-                        />
-                      </div>
+                        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,_transparent_60%,_rgba(0,0,0,0.4)_100%)]"
+                      />
                     </div>
                     <div className="flex items-baseline justify-between gap-3 px-6 py-5">
                       <h3 className="font-display text-xl uppercase tracking-wider">

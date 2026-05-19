@@ -4,9 +4,8 @@ import { useMemo, useState } from "react";
 import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
 import { CaretDown } from "@phosphor-icons/react";
 import { ProductCard } from "./ProductCard";
-import { filterCategories, products, type ProductCategory } from "@/data/products";
+import { products } from "@/data/products";
 
-type Filter = (typeof filterCategories)[number];
 type SortKey = "featured" | "price-asc" | "price-desc" | "newest";
 
 const sorts: Array<{ value: SortKey; label: string }> = [
@@ -17,34 +16,28 @@ const sorts: Array<{ value: SortKey; label: string }> = [
 ];
 
 export function ShopExperience() {
-  const [filter, setFilter] = useState<Filter>("ALL");
   const [sort, setSort] = useState<SortKey>("featured");
   const [sortOpen, setSortOpen] = useState(false);
 
-  const filtered = useMemo(() => {
-    const base =
-      filter === "ALL"
-        ? products
-        : products.filter((p) => p.category === (filter as ProductCategory));
-
-    const sorted = [...base];
+  const sorted = useMemo(() => {
+    const list = [...products];
     switch (sort) {
       case "price-asc":
-        sorted.sort((a, b) => a.priceFrom - b.priceFrom);
+        list.sort((a, b) => a.priceFrom - b.priceFrom);
         break;
       case "price-desc":
-        sorted.sort((a, b) => b.priceFrom - a.priceFrom);
+        list.sort((a, b) => b.priceFrom - a.priceFrom);
         break;
       case "newest":
-        sorted.reverse();
+        list.reverse();
         break;
       case "featured":
       default:
-        sorted.sort((a, b) => Number(Boolean(b.featured)) - Number(Boolean(a.featured)));
+        list.sort((a, b) => Number(Boolean(b.featured)) - Number(Boolean(a.featured)));
         break;
     }
-    return sorted;
-  }, [filter, sort]);
+    return list;
+  }, [sort]);
 
   return (
     <>
@@ -53,42 +46,12 @@ export function ShopExperience() {
         role="region"
         aria-label="Product filters"
       >
-        <div className="mx-auto flex w-full max-w-shell flex-col gap-4 px-6 py-4 md:flex-row md:items-center md:justify-between md:px-10">
-          <div
-            className="-mx-2 flex items-center gap-2 overflow-x-auto px-2 [scrollbar-width:none] md:flex-wrap md:overflow-visible"
-            style={{ WebkitOverflowScrolling: "touch" }}
-          >
-            <LayoutGroup>
-              {filterCategories.map((cat) => {
-                const active = filter === cat;
-                return (
-                  <button
-                    key={cat}
-                    type="button"
-                    onClick={() => setFilter(cat)}
-                    className="relative shrink-0 rounded-full px-4 py-2 text-xs font-medium uppercase tracking-widest transition-colors duration-300"
-                    aria-pressed={active}
-                  >
-                    {active && (
-                      <motion.span
-                        layoutId="filter-pill"
-                        className="absolute inset-0 rounded-full bg-accent-silver"
-                        transition={{ type: "spring", stiffness: 380, damping: 30 }}
-                      />
-                    )}
-                    <span
-                      className={
-                        active
-                          ? "relative z-10 text-bg-primary"
-                          : "relative z-10 text-text-secondary hover:text-text-primary"
-                      }
-                    >
-                      {cat}
-                    </span>
-                  </button>
-                );
-              })}
-            </LayoutGroup>
+        <div className="mx-auto flex w-full max-w-shell items-center justify-between gap-4 px-6 py-4 md:px-10">
+          <div className="flex items-center gap-2">
+            <span className="inline-flex h-2 w-2 rounded-full bg-accent-silver" />
+            <span className="font-mono text-[10px] uppercase tracking-widest text-text-secondary">
+              First Launch · Six 10-on-10 Sets · $750 Each
+            </span>
           </div>
 
           <div className="relative shrink-0">
@@ -102,7 +65,9 @@ export function ShopExperience() {
               <span className="font-mono text-[10px] tracking-widest text-text-muted">
                 Sort
               </span>
-              <span>{sorts.find((s) => s.value === sort)?.label}</span>
+              <span className="hidden sm:inline">
+                {sorts.find((s) => s.value === sort)?.label}
+              </span>
               <CaretDown
                 size={12}
                 weight="bold"
@@ -157,36 +122,22 @@ export function ShopExperience() {
       >
         <div className="mb-10 flex items-baseline justify-between">
           <p className="font-mono text-[11px] uppercase tracking-widest text-text-muted">
-            Showing {filtered.length} {filtered.length === 1 ? "piece" : "pieces"}
+            Showing {sorted.length} {sorted.length === 1 ? "piece" : "pieces"}
           </p>
           <p className="font-mono text-[11px] uppercase tracking-widest text-text-muted">
-            Custom · Lab-Grown · Rimless
+            Lab-Grown · Rimless · Made to Order
           </p>
         </div>
 
-        {filtered.length === 0 ? (
-          <div className="rounded-bezel border border-border-strong bg-bg-secondary/60 p-12 text-center">
-            <p className="font-display text-3xl uppercase tracking-wider text-text-primary">
-              Nothing here yet
-            </p>
-            <p className="mt-3 text-sm text-text-secondary">
-              Try another filter — or reach out for a fully custom build.
-            </p>
-          </div>
-        ) : (
-          <LayoutGroup>
-            <motion.ul
-              layout
-              className="grid grid-cols-1 gap-8 md:grid-cols-2 md:gap-10"
-            >
-              <AnimatePresence mode="popLayout">
-                {filtered.map((product, i) => (
-                  <ProductCard key={product.slug} product={product} priority={i < 2} />
-                ))}
-              </AnimatePresence>
-            </motion.ul>
-          </LayoutGroup>
-        )}
+        <LayoutGroup>
+          <motion.ul layout className="grid grid-cols-1 gap-8 md:grid-cols-2 md:gap-10">
+            <AnimatePresence mode="popLayout">
+              {sorted.map((product, i) => (
+                <ProductCard key={product.slug} product={product} priority={i < 2} />
+              ))}
+            </AnimatePresence>
+          </motion.ul>
+        </LayoutGroup>
       </section>
     </>
   );

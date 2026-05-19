@@ -2,12 +2,21 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowUpRight, Diamond } from "@phosphor-icons/react";
+import { ArrowUpRight } from "@phosphor-icons/react";
 import { motion } from "framer-motion";
 import { Bezel } from "./Bezel";
 import type { Product } from "@/data/products";
 
-export function ProductCard({ product, priority = false }: { product: Product; priority?: boolean }) {
+export function ProductCard({
+  product,
+  priority = false,
+}: {
+  product: Product;
+  priority?: boolean;
+}) {
+  const primary = product.gallery[0];
+  const hoverImage = product.gallery[1];
+
   return (
     <motion.li
       layout
@@ -19,38 +28,35 @@ export function ProductCard({ product, priority = false }: { product: Product; p
     >
       <Link href={`/shop/${product.slug}`} className="block">
         <Bezel innerClassName="bg-bg-secondary">
-          <div className="relative aspect-[4/5] w-full overflow-hidden bg-bg-tertiary">
-            {/* TODO: USER — Replace with actual product image at /public/products/[slug].png */}
+          <div className="relative aspect-square w-full overflow-hidden bg-bg-tertiary">
             <Image
-              src={product.image}
+              src={primary}
               alt={`${product.name} — ${product.descriptor}`}
               fill
               priority={priority}
               sizes="(min-width: 1024px) 640px, 100vw"
               className="object-cover transition-transform duration-700 ease-out-quint group-hover/card:scale-[1.04]"
             />
-            {/* Placeholder visual when image is missing — radial vignette + diamond glyph */}
-            <div
-              aria-hidden
-              className="pointer-events-none absolute inset-0 flex items-center justify-center bg-[radial-gradient(ellipse_at_center,_rgba(232,232,232,0.06),_transparent_70%)]"
-            >
-              <div className="flex flex-col items-center gap-3 text-text-muted">
-                <Diamond size={42} weight="duotone" className="text-accent-silver/40" />
-                <span className="font-mono text-[10px] uppercase tracking-widest">
-                  Add product image
-                </span>
-              </div>
-            </div>
+            {hoverImage && (
+              <Image
+                src={hoverImage}
+                alt=""
+                aria-hidden="true"
+                fill
+                sizes="(min-width: 1024px) 640px, 100vw"
+                className="object-cover opacity-0 transition-opacity duration-500 ease-out-quint group-hover/card:opacity-100"
+              />
+            )}
 
             <div className="absolute left-5 top-5 inline-flex items-center gap-2 rounded-full border border-border-strong bg-bg-primary/70 px-3 py-1 backdrop-blur-md">
               <span className="h-1.5 w-1.5 rounded-full bg-accent-silver" />
               <span className="font-mono text-[10px] uppercase tracking-widest text-text-secondary">
-                {product.category}
+                Full 10-on-10
               </span>
             </div>
 
             <div className="absolute inset-x-5 bottom-5 flex items-end justify-between gap-4 opacity-0 transition-opacity duration-500 ease-out-quint group-hover/card:opacity-100">
-              <span className="font-mono text-[11px] uppercase tracking-widest text-text-secondary">
+              <span className="font-mono text-[11px] uppercase tracking-widest text-text-primary">
                 View Details
               </span>
               <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-accent-silver text-bg-primary transition-transform duration-500 ease-out-quint group-hover/card:translate-x-1 group-hover/card:-translate-y-[2px]">
