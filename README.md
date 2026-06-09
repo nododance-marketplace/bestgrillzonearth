@@ -74,9 +74,51 @@ Each filename matches a product slug in [`data/products.ts`](data/products.ts) �
 
 The "Notify Me" modal currently validates the email client-side and shows a thank-you state. To wire it to a real backend (Klaviyo, ConvertKit, Mailchimp, your own API), edit the `submit` function in [`components/EmailCaptureModal.tsx`](components/EmailCaptureModal.tsx).
 
-### 5. Order CTA
+### 5. Stripe checkout (live)
 
-Each product detail page links **`Start Your Order`** to `mailto:hello@bestgrillz.com`. Swap that for your real contact form, Shopify checkout, or Instagram DM link in [`app/shop/[slug]/page.tsx`](app/shop/[slug]/page.tsx).
+Orders flow through Stripe Checkout with Klarna, Afterpay, and Affirm BNPL enabled.
+
+**Local setup**
+1. Copy `.env.local.example` to `.env.local`.
+2. Fill in `STRIPE_PUBLISHABLE_KEY` and `STRIPE_SECRET_KEY` from
+   https://dashboard.stripe.com/test/apikeys (stay in test mode).
+3. `npm run dev` — the `Start Your Order` button on every product page
+   POSTs to `/api/checkout` and redirects to a hosted Stripe Checkout session.
+
+**Test cards** (Stripe docs: https://stripe.com/docs/testing)
+- Card success: `4242 4242 4242 4242`, any future date, any CVC, any ZIP
+- Card 3DS auth required: `4000 0025 0000 3155`
+- Klarna / Afterpay / Affirm: select the method on Checkout and follow the
+  on-screen test flow — no real account needed in test mode.
+
+**Webhook setup (for order events)**
+- Install the Stripe CLI: https://stripe.com/docs/stripe-cli
+- Run: `stripe listen --forward-to localhost:3009/api/webhooks/stripe`
+- Copy the `whsec_...` it prints into `STRIPE_WEBHOOK_SECRET` in `.env.local`.
+- The handler in [`app/api/webhooks/stripe/route.ts`](app/api/webhooks/stripe/route.ts)
+  logs every event — replace the `console.log` blocks with real fulfillment
+  (email, Slack, DB insert) when you're ready.
+
+**Going live on Vercel**
+1. In the Stripe dashboard, flip the test-mode toggle to live.
+2. Copy the `pk_live_...` and `sk_live_...` keys.
+3. In Vercel → Project Settings → Environment Variables, add:
+   - `STRIPE_PUBLISHABLE_KEY` = `pk_live_...`
+   - `STRIPE_SECRET_KEY` = `sk_live_...`
+   - `STRIPE_WEBHOOK_SECRET` = the `whsec_...` from your live webhook endpoint
+   - `NEXT_PUBLIC_SITE_URL` = your production URL (e.g. `https://bestgrillz.com`)
+4. In the Stripe dashboard, create a webhook endpoint pointing at
+   `https://<your-domain>/api/webhooks/stripe` and subscribe to:
+   - `checkout.session.completed`
+   - `checkout.session.async_payment_succeeded`
+   - `checkout.session.async_payment_failed`
+5. Redeploy — Vercel auto-deploys on every push to `main`.
+
+**Routes**
+- `POST /api/checkout` — creates a Stripe Checkout Session
+- `POST /api/webhooks/stripe` — receives Stripe events
+- `/order/success?session_id=cs_test_...` — confirmation page (server-renders order details from Stripe)
+- `/order/cancel?slug=...` — friendly cancellation page that links back to the product
 
 ## Brand system
 

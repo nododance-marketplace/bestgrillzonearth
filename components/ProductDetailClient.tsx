@@ -3,8 +3,9 @@
 import { useState } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
-import { Diamond } from "@phosphor-icons/react";
+import { Diamond, CreditCard, Spinner, WarningCircle } from "@phosphor-icons/react";
 import { Bezel } from "./Bezel";
+import { CTAButton } from "./CTAButton";
 import type { Product, Finish } from "@/data/products";
 
 const finishStyles: Record<Finish, { swatch: string; ring: string }> = {
@@ -26,14 +27,41 @@ const finishStyles: Record<Finish, { swatch: string; ring: string }> = {
 };
 
 /**
- * Client-side gallery + finish picker for the product detail page.
- * Receives the full product from the server component.
+ * Client-side gallery + finish picker + checkout button for the product
+ * detail page. Receives the full product from the server component.
  */
 export function ProductDetailClient({ product }: { product: Product }) {
   const [activeIndex, setActiveIndex] = useState(0);
   const [finish, setFinish] = useState<Finish>(product.finishes[0]);
+  const [checkoutState, setCheckoutState] = useState<
+    "idle" | "loading" | "error"
+  >("idle");
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const activeImage = product.gallery[activeIndex];
+  const installment = Math.round((product.priceFrom / 4) * 100) / 100;
+
+  async function startOrder() {
+    setCheckoutState("loading");
+    setErrorMessage(null);
+    try {
+      const res = await fetch("/api/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ slug: product.slug, finish }),
+      });
+      const data: { url?: string; error?: string; detail?: string } = await res.json();
+      if (!res.ok || !data.url) {
+        throw new Error(data.error ?? data.detail ?? `Status ${res.status}`);
+      }
+      window.location.href = data.url;
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Something went wrong";
+      console.error("[order] checkout failed:", message);
+      setErrorMessage(message);
+      setCheckoutState("error");
+    }
+  }
 
   return (
     <>
@@ -70,7 +98,6 @@ export function ProductDetailClient({ product }: { product: Product }) {
           </div>
         </Bezel>
 
-        {/* Thumb row — show real gallery images first, fill the row with empty placeholders */}
         {product.gallery.length > 1 && (
           <ul className="mt-4 grid grid-cols-4 gap-3" aria-label="Additional angles">
             {product.gallery.map((src, i) => {
@@ -116,7 +143,7 @@ export function ProductDetailClient({ product }: { product: Product }) {
         )}
       </div>
 
-      {/* Details — finish selector lives inside the right column */}
+      {/* Details — finish selector + checkout button live inside the right col */}
       <div className="md:col-span-5 md:pt-6">
         <span className="inline-flex items-center gap-2 rounded-full border border-border-strong bg-bg-secondary/60 px-3 py-1 backdrop-blur-md">
           <span className="h-1.5 w-1.5 rounded-full bg-accent-silver" />
@@ -142,13 +169,29 @@ export function ProductDetailClient({ product }: { product: Product }) {
           </span>
         </div>
 
+        {/* BNPL inline messaging — Stripe shows the live messaging widgets on
+            the Checkout page; this is a quiet teaser so customers know
+            financing is an option BEFORE they click. */}
+        <div className="mt-3 flex items-start gap-2 text-xs text-text-secondary">
+          <CreditCard size={14} weight="duotone" className="mt-0.5 shrink-0 text-accent-ice" />
+          <p>
+            or 4 interest-free payments of{" "}
+            <span className="font-mono text-text-primary">
+              ${installment.toLocaleString()}
+            </span>{" "}
+            with <span className="text-text-primary">Klarna</span>,{" "}
+            <span className="text-text-primary">Afterpay</span>, or{" "}
+            <span className="text-text-primary">Affirm</span> — select at checkout.
+          </p>
+        </div>
+
         <p className="mt-8 text-base leading-relaxed text-text-secondary">
           {product.longDescription}
         </p>
 
         {/* Finish selector */}
         <fieldset className="mt-10">
-          <legend className="flex items-baseline justify-between gap-3 w-full">
+          <legend className="flex w-full items-baseline justify-between gap-3">
             <span className="font-mono text-[10px] uppercase tracking-widest text-text-muted">
               Finish
             </span>
@@ -186,6 +229,51 @@ export function ProductDetailClient({ product }: { product: Product }) {
             })}
           </div>
         </fieldset>
+
+        {/* Checkout */}
+        <div className="mt-10 flex flex-col gap-3">
+          <div className="flex flex-wrap items-center gap-4">
+            <CTAButton
+              onClick={startOrder}
+              disabled={checkoutState === "loading"}
+              withArrow={checkoutState !== "loading"}
+            >
+              {checkoutState === "loading" ? (
+                <span className="inline-flex items-center gap-2">
+                  <Spinner size={14} weight="bold" className="animate-spin" />
+                  Opening checkout
+                </span>
+              ) : (
+                "Start Your Order"
+              )}
+            </CTAButton>
+            <CTAButton href="/shop" variant="ghost">
+              Browse More
+            </CTAButton>
+          </div>
+          <p className="font-mono text-[10px] uppercase tracking-widest text-text-muted">
+            Secure checkout by Stripe · Card · Klarna · Afterpay · Affirm
+          </p>
+          {checkoutState === "error" && errorMessage && (
+            <div
+              role="alert"
+              className="mt-2 flex items-start gap-2 rounded-2xl border border-rose-400/40 bg-rose-500/[0.06] p-4 text-sm text-rose-100"
+            >
+              <WarningCircle size={18} weight="duotone" className="mt-0.5 shrink-0" />
+              <div>
+                <p className="font-medium">Checkout couldn&rsquo;t start.</p>
+                <p className="mt-1 text-xs opacity-80">{errorMessage}</p>
+                <p className="mt-2 text-xs opacity-70">
+                  If this keeps happening, email{" "}
+                  <a className="underline" href="mailto:hello@bestgrillz.com">
+                    hello@bestgrillz.com
+                  </a>{" "}
+                  and we&rsquo;ll take the order manually.
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </>
   );

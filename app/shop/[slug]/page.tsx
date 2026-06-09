@@ -11,7 +11,6 @@ import {
 import { Nav } from "@/components/Nav";
 import { Footer } from "@/components/Footer";
 import { Bezel } from "@/components/Bezel";
-import { CTAButton } from "@/components/CTAButton";
 import { ProductDetailClient } from "@/components/ProductDetailClient";
 import { products, productBySlug } from "@/data/products";
 
@@ -56,7 +55,7 @@ export default function ProductDetailPage({ params }: { params: { slug: string }
           <ProductDetailClient product={product} />
         </section>
 
-        {/* Highlights + CTAs + AR callout — sits below the gallery on its own row */}
+        {/* Highlights + AR callout — sits below the gallery on its own row */}
         <section className="mx-auto mt-16 grid w-full max-w-shell grid-cols-1 gap-12 px-6 md:grid-cols-12 md:gap-12 md:px-10">
           <div className="md:col-span-7 md:col-start-6">
             <ul className="flex flex-col gap-3 border-y border-border-subtle py-8">
@@ -71,18 +70,6 @@ export default function ProductDetailPage({ params }: { params: { slug: string }
                 </li>
               ))}
             </ul>
-
-            <div className="mt-10 flex flex-wrap items-center gap-4">
-              {/* TODO: USER — Replace with real order link, contact form, or Instagram DM */}
-              <CTAButton
-                href={`mailto:hello@bestgrillz.com?subject=Start Order — ${product.name} (Best Grillz On Earth)`}
-              >
-                Start Your Order
-              </CTAButton>
-              <CTAButton href="/shop" variant="ghost">
-                Browse More
-              </CTAButton>
-            </div>
 
             <div className="mt-10 rounded-2xl border border-border-strong bg-bg-secondary/60 p-5">
               <div className="flex items-start gap-3">
