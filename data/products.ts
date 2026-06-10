@@ -1,99 +1,110 @@
 /**
- * First-launch collection — six full 10-on-10 sets at $750 each,
- * offered in three finishes. Edit copy, prices, or finishes here.
+ * Product catalog. Pricing now lives in /data/pricing.ts and is computed
+ * per configuration at runtime — there's no static `priceFrom` on the
+ * product anymore. The card view derives "From $X" from the kind.
  */
 
-export type Finish = "Gold" | "White Gold" | "Rose Gold";
+import type { ProductKind } from "./pricing";
 
 export type Product = {
   slug: string;
   name: string;
+  kind: ProductKind;
   descriptor: string;
   longDescription: string;
-  priceFrom: number;
   /** First image is the hero shot; subsequent images appear in the gallery thumb row. */
   gallery: string[];
-  finishes: Finish[];
   featured?: boolean;
   highlights: string[];
 };
 
-const FINISHES: Finish[] = ["Gold", "White Gold", "Rose Gold"];
-
-const BASE_HIGHLIGHTS = [
-  "Full 10-on-10 — complete top and bottom set",
-  "Lab-grown diamonds, custom-set per tooth",
+const STONED_HIGHLIGHTS = [
+  "Configurable — pick 6, 8, 10, or 12 teeth on top and bottom independently",
+  "Three stone tiers — Moissanite, Lab Diamond, or Natural Diamond",
+  "Three finishes — Yellow Gold, White Gold, or Rose Gold",
   "Rimless permanent cut, 3D-designed in-house",
-  "Choose your finish: gold, white gold, or rose gold",
+  "Matched-set discount applies when top and bottom counts are equal",
+];
+
+const PLAIN_HIGHLIGHTS = [
+  "Solid metal — no stones, no pavé (industry calls these slugs)",
+  "Three finishes — Yellow Gold, White Gold, or Rose Gold",
+  "Buy top only, bottom only, or save $30 on the full top-and-bottom set",
+  "Rimless permanent cut, 3D-designed in-house",
+  "Same custom-fit guarantee as the iced sets",
 ];
 
 export const products: Product[] = [
   {
     slug: "baby-diamonds",
     name: "Baby Diamonds",
-    descriptor: "Full 10-on-10 · Micro-Pavé · Maximum Shimmer",
+    kind: "stoned",
+    descriptor: "Micro-Pavé · Maximum Shimmer",
     longDescription:
-      "Tightest stone pattern we offer. Hundreds of small lab-grown diamonds set tooth-by-tooth in a true micro-pavé — the surface reads like one continuous sheet of ice. Built for the person who wants every angle to flash.",
-    priceFrom: 750,
+      "Tightest stone pattern we offer. Hundreds of small stones set tooth-by-tooth in a true micro-pavé — the surface reads like one continuous sheet of ice. Built for the person who wants every angle to flash.",
     gallery: ["/products/baby-diamonds-1.png", "/products/baby-diamonds-2.png"],
-    finishes: FINISHES,
     featured: true,
-    highlights: BASE_HIGHLIGHTS,
+    highlights: STONED_HIGHLIGHTS,
   },
   {
     slug: "big-diamonds",
     name: "Big Diamonds",
-    descriptor: "Full 10-on-10 · Statement Stones · Bold Scatter",
+    kind: "stoned",
+    descriptor: "Statement Stones · Bold Scatter",
     longDescription:
-      "Bigger lab-grown diamonds, set in a looser, bolder scatter. Each stone holds the light on its own — no micro-pavé blur, just clear, individual sparkle across every tooth.",
-    priceFrom: 750,
+      "Bigger stones, set in a looser, bolder scatter. Each stone holds the light on its own — no micro-pavé blur, just clear, individual sparkle across every tooth.",
     gallery: ["/products/big-diamonds-1.png", "/products/big-diamonds-2.png"],
-    finishes: FINISHES,
-    highlights: BASE_HIGHLIGHTS,
+    highlights: STONED_HIGHLIGHTS,
   },
   {
     slug: "el-presidente",
     name: "El Presidente",
-    descriptor: "Full 10-on-10 · Center Stones · Iridescent Aurora",
+    kind: "stoned",
+    descriptor: "Center Stones · Iridescent Aurora",
     longDescription:
-      "Statement piece. One large iridescent aurora-cut diamond at the center of every tooth, framed by tight pavé. Light hits it and the whole smile shifts color — different read at every angle.",
-    priceFrom: 750,
+      "Statement piece. One large iridescent aurora-cut stone at the center of every tooth, framed by tight pavé. Light hits it and the whole smile shifts color — different read at every angle.",
     gallery: ["/products/el-presidente-1.png", "/products/el-presidente-2.png"],
-    finishes: FINISHES,
-    highlights: BASE_HIGHLIGHTS,
+    highlights: STONED_HIGHLIGHTS,
   },
   {
     slug: "el-stupido",
     name: "El Stupido",
-    descriptor: "Full 10-on-10 · Stupid-Iced · Center-Stone Pavé",
+    kind: "stoned",
+    descriptor: "Stupid-Iced · Center-Stone Pavé",
     longDescription:
-      "Named because of how stupid-iced it looks under any light. Larger lab-grown stones at the center of each tooth, surrounded by tighter pavé — the perfect middle ground between Baby Diamonds and Big Diamonds.",
-    priceFrom: 750,
+      "Named because of how stupid-iced it looks under any light. Larger stones at the center of each tooth, surrounded by tighter pavé — the perfect middle ground between Baby Diamonds and Big Diamonds.",
     gallery: ["/products/el-stupido.png"],
-    finishes: FINISHES,
-    highlights: BASE_HIGHLIGHTS,
+    highlights: STONED_HIGHLIGHTS,
   },
   {
     slug: "honey-comb",
     name: "Honey Comb",
-    descriptor: "Full 10-on-10 · Hex Pavé Pattern · Tight Cluster",
+    kind: "stoned",
+    descriptor: "Hex Pavé Pattern · Tight Cluster",
     longDescription:
       "Hexagonal micro-pavé. Stones cluster in a true honeycomb geometry instead of the usual random scatter — gives the set a structured, almost architectural read up close, with the same all-over shimmer at a distance.",
-    priceFrom: 750,
     gallery: ["/products/honey-comb-1.png", "/products/honey-comb-2.png"],
-    finishes: FINISHES,
-    highlights: BASE_HIGHLIGHTS,
+    highlights: STONED_HIGHLIGHTS,
   },
   {
     slug: "rectangles",
     name: "Rectangles",
-    descriptor: "Full 10-on-10 · Vertical Baguettes · Architectural",
+    kind: "stoned",
+    descriptor: "Vertical Baguettes · Architectural",
     longDescription:
-      "Vertical baguette-cut diamonds, lined up tooth-by-tooth. The only set in the collection with linear geometry — reads cleaner, more architectural, more watchmaker than jeweler. Light catches the long edges.",
-    priceFrom: 750,
+      "Vertical baguette-cut stones, lined up tooth-by-tooth. The only set in the collection with linear geometry — reads cleaner, more architectural, more watchmaker than jeweler. Light catches the long edges.",
     gallery: ["/products/rectangles.png"],
-    finishes: FINISHES,
-    highlights: BASE_HIGHLIGHTS,
+    highlights: STONED_HIGHLIGHTS,
+  },
+  {
+    slug: "gold-slugs",
+    name: "Gold Slugs",
+    kind: "plain",
+    descriptor: "Solid Gold · No Stones · Industry Classic",
+    longDescription:
+      "Pure metal — no stones, no pavé. The industry calls these slugs. Solid Yellow, White, or Rose Gold caps, rimless and custom-fit. Pick a single half or the full top-and-bottom set; the set saves you $30 vs. buying two halves.",
+    gallery: [],
+    highlights: PLAIN_HIGHLIGHTS,
   },
 ];
 

@@ -13,6 +13,7 @@ import { Footer } from "@/components/Footer";
 import { Bezel } from "@/components/Bezel";
 import { ProductDetailClient } from "@/components/ProductDetailClient";
 import { products, productBySlug } from "@/data/products";
+import { startingPricePlain, startingPriceStoned } from "@/data/pricing";
 
 export function generateStaticParams() {
   return products.map((p) => ({ slug: p.slug }));
@@ -130,35 +131,43 @@ export default function ProductDetailPage({ params }: { params: { slug: string }
             </Link>
           </div>
           <ul className="grid grid-cols-1 gap-8 md:grid-cols-3">
-            {related.map((p) => (
-              <li key={p.slug} className="list-none">
-                <Link href={`/shop/${p.slug}`} className="group/related block">
-                  <Bezel>
-                    <div className="relative aspect-square overflow-hidden bg-bg-tertiary">
-                      <Image
-                        src={p.gallery[0]}
-                        alt={p.name}
-                        fill
-                        sizes="(min-width: 1024px) 380px, 100vw"
-                        className="object-cover transition-transform duration-700 ease-out-quint group-hover/related:scale-105"
-                      />
-                      <div
-                        aria-hidden
-                        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,_transparent_60%,_rgba(0,0,0,0.4)_100%)]"
-                      />
-                    </div>
-                    <div className="flex items-baseline justify-between gap-3 px-6 py-5">
-                      <h3 className="font-display text-xl uppercase tracking-wider">
-                        {p.name}
-                      </h3>
-                      <span className="diamond-text font-mono text-sm font-semibold tracking-wider">
-                        ${p.priceFrom.toLocaleString()}
-                      </span>
-                    </div>
-                  </Bezel>
-                </Link>
-              </li>
-            ))}
+            {related.map((p) => {
+              const from = p.kind === "plain" ? startingPricePlain() : startingPriceStoned();
+              const heroImage = p.gallery[0];
+              return (
+                <li key={p.slug} className="list-none">
+                  <Link href={`/shop/${p.slug}`} className="group/related block">
+                    <Bezel>
+                      <div className="relative aspect-square overflow-hidden bg-bg-tertiary">
+                        {heroImage ? (
+                          <Image
+                            src={heroImage}
+                            alt={p.name}
+                            fill
+                            sizes="(min-width: 1024px) 380px, 100vw"
+                            className="object-cover transition-transform duration-700 ease-out-quint group-hover/related:scale-105"
+                          />
+                        ) : (
+                          <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_25%,#FFE9A3_0%,#E8B547_28%,#A87223_68%,#5C3F12_100%)]" />
+                        )}
+                        <div
+                          aria-hidden
+                          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,_transparent_60%,_rgba(0,0,0,0.4)_100%)]"
+                        />
+                      </div>
+                      <div className="flex items-baseline justify-between gap-3 px-6 py-5">
+                        <h3 className="font-display text-xl uppercase tracking-wider">
+                          {p.name}
+                        </h3>
+                        <span className="diamond-text font-mono text-sm font-semibold tracking-wider">
+                          From ${from.toLocaleString()}
+                        </span>
+                      </div>
+                    </Bezel>
+                  </Link>
+                </li>
+              );
+            })}
           </ul>
         </section>
       </main>

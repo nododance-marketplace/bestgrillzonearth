@@ -4,7 +4,11 @@ import { useMemo, useState } from "react";
 import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
 import { CaretDown } from "@phosphor-icons/react";
 import { ProductCard } from "./ProductCard";
-import { products } from "@/data/products";
+import { products, type Product } from "@/data/products";
+import { startingPricePlain, startingPriceStoned } from "@/data/pricing";
+
+const startingPriceFor = (p: Product) =>
+  p.kind === "plain" ? startingPricePlain() : startingPriceStoned();
 
 type SortKey = "featured" | "price-asc" | "price-desc" | "newest";
 
@@ -23,10 +27,10 @@ export function ShopExperience() {
     const list = [...products];
     switch (sort) {
       case "price-asc":
-        list.sort((a, b) => a.priceFrom - b.priceFrom);
+        list.sort((a, b) => startingPriceFor(a) - startingPriceFor(b));
         break;
       case "price-desc":
-        list.sort((a, b) => b.priceFrom - a.priceFrom);
+        list.sort((a, b) => startingPriceFor(b) - startingPriceFor(a));
         break;
       case "newest":
         list.reverse();
@@ -50,7 +54,7 @@ export function ShopExperience() {
           <div className="flex items-center gap-2">
             <span className="inline-flex h-2 w-2 rounded-full bg-accent-silver" />
             <span className="font-mono text-[10px] uppercase tracking-widest text-text-secondary">
-              First Launch · Six 10-on-10 Sets · $750 Each
+              Build Your Own · From $150 · Moissanite / Lab / Natural
             </span>
           </div>
 

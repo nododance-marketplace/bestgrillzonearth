@@ -2,10 +2,19 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowUpRight } from "@phosphor-icons/react";
+import { ArrowUpRight, Coin } from "@phosphor-icons/react";
 import { motion } from "framer-motion";
 import { Bezel } from "./Bezel";
 import type { Product } from "@/data/products";
+import { startingPricePlain, startingPriceStoned } from "@/data/pricing";
+
+function startingPriceFor(product: Product): number {
+  return product.kind === "plain" ? startingPricePlain() : startingPriceStoned();
+}
+
+function badgeFor(product: Product): string {
+  return product.kind === "plain" ? "Plain Gold · Slugs" : "Custom · 6/8/10/12";
+}
 
 export function ProductCard({
   product,
@@ -16,6 +25,7 @@ export function ProductCard({
 }) {
   const primary = product.gallery[0];
   const hoverImage = product.gallery[1];
+  const fromPrice = startingPriceFor(product);
 
   return (
     <motion.li
@@ -29,35 +39,41 @@ export function ProductCard({
       <Link href={`/shop/${product.slug}`} className="block">
         <Bezel innerClassName="bg-bg-secondary">
           <div className="relative aspect-square w-full overflow-hidden bg-bg-tertiary">
-            <Image
-              src={primary}
-              alt={`${product.name} — ${product.descriptor}`}
-              fill
-              priority={priority}
-              sizes="(min-width: 1024px) 640px, 100vw"
-              className="object-cover transition-transform duration-700 ease-out-quint group-hover/card:scale-[1.04]"
-            />
-            {hoverImage && (
-              <Image
-                src={hoverImage}
-                alt=""
-                aria-hidden="true"
-                fill
-                sizes="(min-width: 1024px) 640px, 100vw"
-                className="object-cover opacity-0 transition-opacity duration-500 ease-out-quint group-hover/card:opacity-100"
-              />
+            {primary ? (
+              <>
+                <Image
+                  src={primary}
+                  alt={`${product.name} — ${product.descriptor}`}
+                  fill
+                  priority={priority}
+                  sizes="(min-width: 1024px) 640px, 100vw"
+                  className="object-cover transition-transform duration-700 ease-out-quint group-hover/card:scale-[1.04]"
+                />
+                {hoverImage && (
+                  <Image
+                    src={hoverImage}
+                    alt=""
+                    aria-hidden="true"
+                    fill
+                    sizes="(min-width: 1024px) 640px, 100vw"
+                    className="object-cover opacity-0 transition-opacity duration-500 ease-out-quint group-hover/card:opacity-100"
+                  />
+                )}
+              </>
+            ) : (
+              <PlainGoldVisual />
             )}
 
             <div className="absolute left-5 top-5 inline-flex items-center gap-2 rounded-full border border-border-strong bg-bg-primary/70 px-3 py-1 backdrop-blur-md">
               <span className="h-1.5 w-1.5 rounded-full bg-accent-silver" />
               <span className="font-mono text-[10px] uppercase tracking-widest text-text-secondary">
-                Full 10-on-10
+                {badgeFor(product)}
               </span>
             </div>
 
             <div className="absolute inset-x-5 bottom-5 flex items-end justify-between gap-4 opacity-0 transition-opacity duration-500 ease-out-quint group-hover/card:opacity-100">
               <span className="font-mono text-[11px] uppercase tracking-widest text-text-primary">
-                View Details
+                Configure & Order
               </span>
               <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-accent-silver text-bg-primary transition-transform duration-500 ease-out-quint group-hover/card:translate-x-1 group-hover/card:-translate-y-[2px]">
                 <ArrowUpRight size={16} weight="bold" />
@@ -79,12 +95,34 @@ export function ProductCard({
                 From
               </p>
               <p className="diamond-text font-mono text-xl font-semibold tracking-wider">
-                ${product.priceFrom.toLocaleString()}
+                ${fromPrice.toLocaleString()}
               </p>
             </div>
           </div>
         </Bezel>
       </Link>
     </motion.li>
+  );
+}
+
+/**
+ * Synthetic visual for the "Gold Slugs" product when no photography exists.
+ * Renders a metallic gradient panel with a centered brand glyph so the card
+ * never shows a broken Image element.
+ */
+function PlainGoldVisual() {
+  return (
+    <div className="absolute inset-0 flex items-center justify-center bg-[radial-gradient(circle_at_30%_25%,#FFE9A3_0%,#E8B547_28%,#A87223_68%,#5C3F12_100%)]">
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,_transparent_45%,_rgba(0,0,0,0.45)_100%)]"
+      />
+      <div className="relative flex flex-col items-center gap-3 text-bg-primary/80">
+        <Coin size={72} weight="duotone" />
+        <span className="font-mono text-[10px] uppercase tracking-[0.3em]">
+          Solid Gold · Slugs
+        </span>
+      </div>
+    </div>
   );
 }
