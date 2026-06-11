@@ -20,7 +20,7 @@ export type Product = {
 
 const STONED_HIGHLIGHTS = [
   "Configurable — pick 6, 8, 10, or 12 teeth on top and bottom independently",
-  "Three stone tiers — Moissanite, Lab Diamond, or Natural Diamond",
+  "Two stone tiers — Moissanite or Lab Diamond",
   "Three finishes — Yellow Gold, White Gold, or Rose Gold",
   "Rimless permanent cut, 3D-designed in-house",
   "Matched-set discount applies when top and bottom counts are equal",
@@ -86,16 +86,8 @@ export const products: Product[] = [
     gallery: ["/products/honey-comb-1.png", "/products/honey-comb-2.png"],
     highlights: STONED_HIGHLIGHTS,
   },
-  {
-    slug: "rectangles",
-    name: "Rectangles",
-    kind: "stoned",
-    descriptor: "Vertical Baguettes · Architectural",
-    longDescription:
-      "Vertical baguette-cut stones, lined up tooth-by-tooth. The only set in the collection with linear geometry — reads cleaner, more architectural, more watchmaker than jeweler. Light catches the long edges.",
-    gallery: ["/products/rectangles.png"],
-    highlights: STONED_HIGHLIGHTS,
-  },
+  // Rectangles temporarily removed — inventory unavailable. Re-add to bring
+  // it back; the image at /public/products/rectangles.png is still in place.
   {
     slug: "gold-slugs",
     name: "Gold Slugs",

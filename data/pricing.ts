@@ -23,7 +23,10 @@ export type ToothCount = 0 | 6 | 8 | 10 | 12;
 export type PlainHalf = "top" | "bottom" | "set";
 export type Finish = "Yellow Gold" | "White Gold" | "Rose Gold";
 
-export const STONE_TIERS: StoneTier[] = ["moissanite", "lab", "natural"];
+// Natural diamond is temporarily hidden until inventory is available.
+// To re-enable: add "natural" back to this array — the type, prices,
+// label, and blurb are still defined below.
+export const STONE_TIERS: StoneTier[] = ["moissanite", "lab"];
 export const TOOTH_COUNTS: ToothCount[] = [0, 6, 8, 10, 12];
 export const PLAIN_HALVES: PlainHalf[] = ["top", "bottom", "set"];
 export const FINISHES: Finish[] = ["Yellow Gold", "White Gold", "Rose Gold"];
